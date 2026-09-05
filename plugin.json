@@ -1,0 +1,20 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "nittim",
+  "version": "1.0.0",
+  "description": "Production-safety audits for AI-generated code, with a fix for every finding.",
+  "author": {
+    "name": "Ilan Wolberger",
+    "url": "https://nittim.com"
+  },
+  "homepage": "https://nittim.com",
+  "repository": "https://github.com/ilanwolberger/nittim-mcp",
+  "license": "MIT",
+  "keywords": [
+    "security",
+    "code-audit",
+    "production-readiness",
+    "ai-generated-code",
+    "mcp"
+  ]
+}

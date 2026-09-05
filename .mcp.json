@@ -1,0 +1,9 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "nittim": {
+      "type": "streamable-http",
+      "url": "https://nittim.com/api/mcp"
+    }
+  }
+}

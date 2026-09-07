@@ -31,10 +31,23 @@ Or add it to any MCP client as:
 
 The free tools work right away, no account needed. Paid tools need a key — mint one at [nittim.com/keys](https://nittim.com/keys).
 
+## Skills
+
+`skills/nittim-loop` is a free, local self-review — it walks Claude Code
+through [nittim's public checklist](https://nittim.com/selfcheck.md) over a
+repository you own, on your own model, with nothing uploaded. Try it with:
+
+```
+git clone https://github.com/ilanwolberger/nittim-mcp
+claude --plugin-dir ./nittim-mcp
+```
+
+then run `/nittim:nittim-loop` inside a project you want reviewed.
+
 ## Learn more
 
 Full reference, for people and for agents: [nittim.com/agents](https://nittim.com/agents)
 
 ---
 
-This repository holds only the [Open Plugins](https://agent-plugins.org) manifest for nittim's MCP server — `plugin.json` and `.mcp.json`, pointing at the live endpoint above. It carries no application code.
+This repository holds the [Open Plugins](https://agent-plugins.org) manifest for nittim's MCP server — `plugin.json` and `.mcp.json`, pointing at the live endpoint above — plus a Claude Code plugin manifest (`.claude-plugin/plugin.json`) and the `nittim-loop` skill. It carries no other application code.

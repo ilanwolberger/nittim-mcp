@@ -89,6 +89,9 @@ https://nittim.com/keys):
   category → severity counts, how many findings it fixed, and whether it
   was clean. The one-shot sweep in step 2 is pass 1, covering every lens at
   once; each convergence round in step 4 is a later pass.
+- `mode` — `one_shot` when the first pass swept every lens over the whole
+  tree at once (the procedure above), `serial` otherwise; and
+  `first_wave_lenses` — how many lenses ran in that first sweep.
 - `convergence` and `swept` if you know them.
 
 Never a title, a file path, or a snippet — the schema has no field for

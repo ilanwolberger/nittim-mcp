@@ -1,6 +1,7 @@
 ---
-name: nittim-loop
 description: Run the nittim Loop — a free, local self-review of the developer's own repository, using nittim's public checklist. Use when asked to self-audit, security-review, or "run the nittim loop" on a codebase the developer owns, especially before paying for a nittim audit. Nothing leaves the machine unless the developer separately says yes to that.
+alwaysApply: false
+globs:
 ---
 
 # The nittim Loop

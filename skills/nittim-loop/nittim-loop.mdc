@@ -93,7 +93,8 @@ https://nittim.com/keys):
   (e.g. lowercased `owner/repo`); never send the name itself.
 - `repo_size_bucket` — xs/s/m/l/xl.
 - `passes` — one entry per pass actually run, in order, each with its
-  category → severity counts, how many findings it fixed, and whether it
+  findings as an array of `{category, critical, high, medium, low}` (a
+  count left out defaults to 0), how many findings it fixed, and whether it
   was clean. The one-shot sweep in step 2 is pass 1, covering every lens at
   once; each convergence round in step 4 is a later pass.
 - `mode` — `one_shot` when the first pass swept every lens over the whole

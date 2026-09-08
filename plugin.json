@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "nittim",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Production-safety audits for AI-generated code, with a fix for every finding.",
   "author": {
     "name": "Ilan Wolberger",

@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# nittim-mcp pre-push hook — the secret scan, and nothing else.
+#
+# This repo is PUBLIC and holds prose and manifests only, so the gate here is the one
+# failure that cannot be undone: a secret that reaches GitHub. Everything cheap and
+# reversible (manifest parity, URL health, skill-copy parity) lives in scripts/gate.sh
+# and runs at merge time, not on every push (ruling 2026-08-26).
+#
+# Install (once per clone):  git config core.hooksPath hooks
+# scripts/gate.sh checks that this is set and fails if it is not.
+#
+# Scope: only the commits this push ADDS (merge-base with origin/main .. local sha), so
+# history is never re-litigated. Runtime: 1-2 seconds.
+
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "pre-push: gitleaks is not installed (brew install gitleaks). Refusing to push without a secret scan." >&2
+  exit 1
+fi
+
+ZERO="0000000000000000000000000000000000000000"
+found_leak=0
+scanned_anything=0
+
+scan_range() {
+  local range="$1"
+  echo "  scanning ${range}"
+  if ! gitleaks detect --source . --config .gitleaks.toml --log-opts="${range}" --redact --no-banner; then
+    found_leak=1
+  fi
+}
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+  [ "$local_sha" = "$ZERO" ] && continue
+  base=""
+  if git rev-parse --verify --quiet origin/main >/dev/null 2>&1; then
+    base="$(git merge-base origin/main "$local_sha" 2>/dev/null || true)"
+  fi
+  if [ -z "$base" ] && [ "$remote_sha" != "$ZERO" ]; then
+    base="$remote_sha"
+  fi
+  if [ -z "$base" ]; then
+    base="$(git rev-list --max-parents=0 "$local_sha" | tail -1)"
+  fi
+  [ "$base" = "$local_sha" ] && continue
+  scanned_anything=1
+  scan_range "${base}..${local_sha}"
+done
+
+if [ "$scanned_anything" = 0 ]; then
+  echo "  (nothing new to scan on this push)"
+fi
+
+if [ "$found_leak" != 0 ]; then
+  echo "pre-push: gitleaks found what looks like a secret in the commits being pushed — see above." >&2
+  echo "pre-push: remove it and rotate it before pushing; this repo is public." >&2
+  exit 1
+fi
+echo "pre-push: secret scan clean"

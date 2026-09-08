@@ -25,6 +25,7 @@ Or add it to any MCP client as:
 ```json
 {
   "nittim": {
+    "type": "streamable-http",
     "url": "https://nittim.com/api/mcp"
   }
 }
@@ -47,8 +48,10 @@ git clone https://github.com/ilanwolberger/nittim-mcp
 claude --plugin-dir ./nittim-mcp
 ```
 
-then run `/nittim:nittim-loop` inside a project you want reviewed. Or install
-it once as a skill available in every project:
+then run `/nittim:nittim-loop` inside a project you want reviewed. Loading the
+plugin also connects the nittim MCP server (from `.mcp.json`), so `get_loop` and
+the free scanners are available in the same session. Or install the skill on
+its own, available in every project:
 
 ```
 mkdir -p ~/.claude/skills/nittim-loop && curl -fsSL https://nittim.com/skills/nittim-loop/SKILL.md -o ~/.claude/skills/nittim-loop/SKILL.md
@@ -68,4 +71,4 @@ Full reference, for people and for agents: [nittim.com/agents](https://nittim.co
 
 ---
 
-This repository holds the [Open Plugins](https://agent-plugins.org) manifest for nittim's MCP server — `plugin.json` and `.mcp.json`, pointing at the live endpoint above — plus a Claude Code plugin manifest (`.claude-plugin/plugin.json`) and the `nittim-loop` skill (`SKILL.md` for Claude Code, `nittim-loop.mdc` for Cursor). It carries no other application code.
+This repository holds the [Open Plugins](https://agent-plugins.org) manifest for nittim's MCP server — `plugin.json` and `.mcp.json`, pointing at the live endpoint above — plus a Claude Code plugin manifest (`.claude-plugin/plugin.json`) and the `nittim-loop` skill (`SKILL.md` for Claude Code, `nittim-loop.mdc` for Cursor). It carries no other application code. `scripts/gate.sh` checks the repo's own consistency — manifests agree, both skill copies identical, every URL above resolves — and `hooks/pre-push` runs a secret scan before anything reaches GitHub (`git config core.hooksPath hooks` once per clone).

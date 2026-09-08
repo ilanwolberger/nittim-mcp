@@ -1,0 +1,16 @@
+# gitleaks config for nittim-mcp — a PUBLIC repo, so a pushed secret is indexed within minutes.
+#
+# [extend] is load-bearing: a --config file REPLACES gitleaks' ~180 built-in rules unless it
+# says useDefault = true (measured in fis, 2026-08-19). Without it this file would load zero
+# rules and report "no leaks found" on everything.
+[extend]
+useDefault = true
+
+# gitleaks 8.30 ships no Anthropic-key rule (measured in fis, 2026-09-07: a planted
+# sk-ant-api03-… key passed clean). This adds one. Proved red on 2026-09-08 by planting a
+# key of this shape in a scratch commit and watching hooks/pre-push exit 1.
+[[rules]]
+id = "anthropic-api-key"
+description = "Anthropic API key"
+regex = '''sk-ant-api03-[A-Za-z0-9_-]{93,}'''
+keywords = ["sk-ant-api03-"]

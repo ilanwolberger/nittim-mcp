@@ -1,0 +1,25 @@
+{
+  "name": "nittim",
+  "owner": {
+    "name": "Ilan Wolberger",
+    "url": "https://nittim.com"
+  },
+  "metadata": {
+    "description": "nittim — production-safety audits for AI-generated code, over MCP.",
+    "version": "1.1.0"
+  },
+  "plugins": [
+    {
+      "name": "nittim",
+      "source": "./",
+      "description": "Production-safety audits for AI-generated code, with a fix for every finding. Connects the nittim MCP server and adds the free nittim-loop self-review skill.",
+      "version": "1.1.0",
+      "author": { "name": "Ilan Wolberger", "url": "https://nittim.com" },
+      "homepage": "https://nittim.com",
+      "repository": "https://github.com/ilanwolberger/nittim-mcp",
+      "license": "MIT",
+      "keywords": ["security", "code-audit", "production-readiness", "ai-generated-code", "mcp"],
+      "category": "security"
+    }
+  ]
+}

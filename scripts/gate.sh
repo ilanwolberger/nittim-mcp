@@ -38,6 +38,25 @@ assert s["url"]=="https://nittim.com/api/mcp" and s["type"]=="streamable-http", 
 print("  ✓ .mcp.json points at https://nittim.com/api/mcp (streamable-http)")
 PY
 
+echo "── gate: registry + marketplace manifests ──"
+python3 - <<'PY2' || fail=1
+import json
+v=json.load(open("plugin.json"))["version"]
+s=json.load(open("server.json")); m=json.load(open(".claude-plugin/marketplace.json"))
+bad=[]
+if s["version"]!=v: bad.append(f"server.json version {s['version']} != {v}")
+if s["name"]!="com.nittim/nittim": bad.append("server.json name changed")
+if s["remotes"][0]["url"]!="https://nittim.com/api/mcp": bad.append("server.json remote url changed")
+if len(s["description"])>100: bad.append("server.json description > 100 chars (registry rejects)")
+p=m["plugins"][0]
+if p["version"]!=v or m["metadata"]["version"]!=v: bad.append("marketplace.json version drift")
+if p["source"]!="./" or p["name"]!="nittim" or m["name"]!="nittim": bad.append("marketplace.json plugin entry changed")
+for b in bad: print("  ✗ "+b)
+if bad: raise SystemExit(1)
+print(f"  ✓ server.json and marketplace.json agree on version {v}, name, endpoint")
+PY2
+if command -v mcp-publisher >/dev/null; then mcp-publisher validate >/dev/null 2>&1 && ok "server.json valid against the registry schema" || bad "mcp-publisher validate failed"; fi
+
 echo "── gate: skill copies identical ──"
 body() { awk 'f;/^---$/{c++} c==2&&!f{f=1}' "$1"; }
 if diff -q <(body skills/nittim-loop/SKILL.md) <(body skills/nittim-loop/nittim-loop.mdc) >/dev/null; then ok "SKILL.md and nittim-loop.mdc bodies identical"
@@ -73,6 +92,15 @@ if [ "$offline" = 0 ]; then
   init=$(curl -s -m 20 -X POST https://nittim.com/api/mcp -H content-type:application/json -H accept:application/json,text/event-stream \
     -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-03-26","capabilities":{},"clientInfo":{"name":"nittim-mcp-gate","version":"0"}}}')
   echo "$init" | grep -q '"serverInfo":{"name":"nittim"' && ok "MCP initialize answered by nittim" || bad "MCP initialize did not answer as nittim"
+  echo "── gate: badges and listing ──"
+  for u in "https://cursor.com/install-mcp?name=nittim&config=eyJ1cmwiOiJodHRwczovL25pdHRpbS5jb20vYXBpL21jcCJ9" https://cursor.com/deeplink/mcp-install-dark.svg; do
+    code=$(curl -s -o /dev/null -w '%{http_code}' -m 15 -A Mozilla/5.0 "$u"); [ "$code" = 200 ] && ok "$code ${u:0:60}" || bad "$code $u"
+  done
+  code=$(curl -s -o /dev/null -w '%{http_code}' -m 15 "https://vscode.dev/redirect/mcp/install?name=nittim&config=%7B%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Fnittim.com%2Fapi%2Fmcp%22%7D"); [ "$code" = 302 ] && ok "302 vscode.dev redirect" || bad "$code vscode.dev redirect (expected 302)"
+  grep -qE 'cursor://|\(vscode:' README.md && bad "README links a raw cursor:// or vscode: scheme (GitHub strips those; use the https wrappers)" || ok "README badge links use https wrappers"
+  listed=$(curl -s -m 15 "https://registry.modelcontextprotocol.io/v0/servers?search=com.nittim/nittim" | python3 -c 'import sys,json; d=json.load(sys.stdin); print(",".join(x.get("server",x).get("version","?") for x in d.get("servers",[])))')
+  [ -n "$listed" ] && ok "MCP Registry lists com.nittim/nittim (versions: $listed)" || bad "MCP Registry does not list com.nittim/nittim"
+  dig +short TXT nittim.com @8.8.8.8 | grep -q 'v=MCPv1' && ok "nittim.com apex TXT carries the registry DNS proof" || bad "registry DNS proof TXT missing from nittim.com apex"
   echo "── gate: served skill copies match the repo ──"
   curl -s -m 15 https://nittim.com/skills/nittim-loop/SKILL.md | diff -q - skills/nittim-loop/SKILL.md >/dev/null && ok "live SKILL.md == repo" || bad "live SKILL.md differs from repo (fis serves it — sync one side)"
   curl -s -m 15 https://nittim.com/skills/nittim-loop/nittim-loop.mdc | diff -q - skills/nittim-loop/nittim-loop.mdc >/dev/null && ok "live nittim-loop.mdc == repo" || bad "live nittim-loop.mdc differs from repo"

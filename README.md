@@ -86,4 +86,6 @@ Full reference, for people and for agents: [nittim.com/agents](https://nittim.co
 
 ---
 
+Listed on [Smithery](https://smithery.ai/servers/ilan-wolberger/nittim), [Glama](https://glama.ai/mcp/connectors/com.nittim/nittim), [cursor.directory](https://cursor.directory/plugins/nittim) and the [MCP Registry](https://registry.modelcontextprotocol.io/v0/servers?search=com.nittim/nittim).
+
 This repository holds the listing manifests for nittim's MCP server, all pointing at the live endpoint above: [Open Plugins](https://agent-plugins.org) (`plugin.json`, `.mcp.json`), the [MCP Registry](https://registry.modelcontextprotocol.io) (`server.json`), a Claude Code plugin and marketplace (`.claude-plugin/`), and the `nittim-loop` skill (`SKILL.md` for Claude Code, `nittim-loop.mdc` for Cursor). It carries no other application code. `scripts/gate.sh` checks the repo's own consistency — manifests agree, both skill copies identical, every URL above resolves — and `hooks/pre-push` runs a secret scan before anything reaches GitHub (`git config core.hooksPath hooks` once per clone).

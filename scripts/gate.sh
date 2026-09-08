@@ -98,8 +98,18 @@ if [ "$offline" = 0 ]; then
   done
   code=$(curl -s -o /dev/null -w '%{http_code}' -m 15 "https://vscode.dev/redirect/mcp/install?name=nittim&config=%7B%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Fnittim.com%2Fapi%2Fmcp%22%7D"); [ "$code" = 302 ] && ok "302 vscode.dev redirect" || bad "$code vscode.dev redirect (expected 302)"
   grep -qE 'cursor://|\(vscode:' README.md && bad "README links a raw cursor:// or vscode: scheme (GitHub strips those; use the https wrappers)" || ok "README badge links use https wrappers"
-  listed=$(curl -s -m 15 "https://registry.modelcontextprotocol.io/v0/servers?search=com.nittim/nittim" | python3 -c 'import sys,json; d=json.load(sys.stdin); print(",".join(x.get("server",x).get("version","?") for x in d.get("servers",[])))')
+  # The registry search has returned an empty body on a fresh listing; one retry keeps a flaky upstream from reading as a red gate.
+  listed=""
+  for attempt in 1 2 3; do
+    listed=$(curl -s -m 15 "https://registry.modelcontextprotocol.io/v0/servers?search=com.nittim/nittim" | python3 -c 'import sys,json
+try: d=json.load(sys.stdin); print(",".join(x.get("server",x).get("version","?") for x in d.get("servers",[])))
+except Exception: print("")' )
+    [ -n "$listed" ] && break; sleep 5
+  done
   [ -n "$listed" ] && ok "MCP Registry lists com.nittim/nittim (versions: $listed)" || bad "MCP Registry does not list com.nittim/nittim"
+  for u in https://smithery.ai/servers/ilan-wolberger/nittim https://glama.ai/mcp/connectors/com.nittim/nittim; do
+    code=$(curl -s -o /dev/null -w '%{http_code}' -m 20 -A 'Mozilla/5.0 (Macintosh) Chrome/128' "$u"); [ "$code" = 200 ] && ok "$code $u" || bad "$code $u (directory listing gone?)"
+  done
   dig +short TXT nittim.com @8.8.8.8 | grep -q 'v=MCPv1' && ok "nittim.com apex TXT carries the registry DNS proof" || bad "registry DNS proof TXT missing from nittim.com apex"
   echo "── gate: served skill copies match the repo ──"
   curl -s -m 15 https://nittim.com/skills/nittim-loop/SKILL.md | diff -q - skills/nittim-loop/SKILL.md >/dev/null && ok "live SKILL.md == repo" || bad "live SKILL.md differs from repo (fis serves it — sync one side)"

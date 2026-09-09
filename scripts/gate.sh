@@ -98,11 +98,12 @@ if [ "$offline" = 0 ]; then
   done
   code=$(curl -s -o /dev/null -w '%{http_code}' -m 15 "https://vscode.dev/redirect/mcp/install?name=nittim&config=%7B%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Fnittim.com%2Fapi%2Fmcp%22%7D"); [ "$code" = 302 ] && ok "302 vscode.dev redirect" || bad "$code vscode.dev redirect (expected 302)"
   grep -qE 'cursor://|\(vscode:' README.md && bad "README links a raw cursor:// or vscode: scheme (GitHub strips those; use the https wrappers)" || ok "README badge links use https wrappers"
-  # The registry search has returned an empty body on a fresh listing; one retry keeps a flaky upstream from reading as a red gate.
+  # Read the canonical versions endpoint, not the search index: search returned an empty
+  # result set intermittently (measured 2026-09-09) while the listing was present all along.
   listed=""
   for attempt in 1 2 3; do
-    listed=$(curl -s -m 15 "https://registry.modelcontextprotocol.io/v0/servers?search=com.nittim/nittim" | python3 -c 'import sys,json
-try: d=json.load(sys.stdin); print(",".join(x.get("server",x).get("version","?") for x in d.get("servers",[])))
+    listed=$(curl -s -m 15 "https://registry.modelcontextprotocol.io/v0/servers/com.nittim%2Fnittim/versions" | python3 -c 'import sys,json
+try: d=json.load(sys.stdin); print(",".join(x["server"]["version"] for x in d.get("servers",[])))
 except Exception: print("")' )
     [ -n "$listed" ] && break; sleep 5
   done

@@ -12,7 +12,7 @@
     {
       "name": "nittim",
       "source": "./",
-      "description": "Production-safety audits for AI-generated code, with a fix for every finding. Connects the nittim MCP server and adds the free nittim-loop self-review skill.",
+      "description": "Production-safety audits for AI-generated code, with a fix for every finding. Connects the nittim MCP server and adds the free nittim-loop self-review skill. Auto mode users: see \"Using Claude Code's auto mode?\" in the README.",
       "version": "1.1.0",
       "author": { "name": "Ilan Wolberger", "url": "https://nittim.com" },
       "homepage": "https://nittim.com",

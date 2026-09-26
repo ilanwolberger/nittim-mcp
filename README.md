@@ -41,6 +41,16 @@ or just the server:
 claude mcp add --transport http nittim https://nittim.com/api/mcp
 ```
 
+### Using Claude Code's auto mode?
+
+Auto mode refuses any tool it reads as able to spend money before that tool runs. nittim's paid tools always quote a price first, and every charge waits for the account owner's click on a confirmation link — so allowing the server never lets an assistant spend on its own. Add this to `~/.claude/settings.json` (or your project's `.claude/settings.json`):
+
+```json
+{ "permissions": { "allow": ["mcp__nittim"] } }
+```
+
+The rule name follows whatever you called the server in `claude mcp add` — it's `mcp__<your-name>` if you picked something other than `nittim`. The free tools (scan, estimate, checklist) work without this rule.
+
 **Cursor** or **VS Code**: the buttons at the top, or `nittim` → `https://nittim.com/api/mcp` in your MCP settings.
 
 Or add it to any MCP client as:

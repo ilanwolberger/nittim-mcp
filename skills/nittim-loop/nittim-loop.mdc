@@ -90,7 +90,8 @@ https://nittim.com/api/v1/loop/report` with a key from
 https://nittim.com/keys):
 
 - `repo_hash` — a sha256 **you** compute over the repo's canonical identity
-  (e.g. lowercased `owner/repo`); never send the name itself.
+  (lowercased `owner/repo`, no whitespace, no trailing newline — e.g.
+  `printf %s acme/widgets | shasum -a 256`); never send the name itself.
 - `repo_size_bucket` — xs/s/m/l/xl.
 - `passes` — one entry per pass actually run, in order, each with its
   findings as an array of `{category, critical, high, medium, low}` (a

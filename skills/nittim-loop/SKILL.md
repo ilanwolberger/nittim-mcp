@@ -1,6 +1,7 @@
 ---
 name: nittim-loop
 description: Run the nittim Loop — a free, local self-review of the developer's own repository, using nittim's public checklist. Use when asked to self-audit, security-review, or "run the nittim loop" on a codebase the developer owns, especially before paying for a nittim audit. Nothing leaves the machine unless the developer separately says yes to that.
+allowed-tools: Read, Grep, Glob, WebFetch(domain:nittim.com), mcp__nittim__get_loop, mcp__nittim__report_loop
 ---
 
 # The nittim Loop
@@ -89,7 +90,8 @@ https://nittim.com/api/v1/loop/report` with a key from
 https://nittim.com/keys):
 
 - `repo_hash` — a sha256 **you** compute over the repo's canonical identity
-  (e.g. lowercased `owner/repo`); never send the name itself.
+  (lowercased `owner/repo`, no whitespace, no trailing newline — e.g.
+  `printf %s acme/widgets | shasum -a 256`); never send the name itself.
 - `repo_size_bucket` — xs/s/m/l/xl.
 - `passes` — one entry per pass actually run, in order, each with its
   findings as an array of `{category, critical, high, medium, low}` (a
